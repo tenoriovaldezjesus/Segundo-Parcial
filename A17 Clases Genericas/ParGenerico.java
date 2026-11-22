@@ -21,11 +21,11 @@ public class ParGenerico<K, V> {
 
     public static void main(String[] args) {
         // Par de Integer y String (Matrícula -> Alumno)
-        ParGenerico<Integer, String> alumno = new ParGenerico<>(2525041, "Ángel Sánchez");
+        ParGenerico<Integer, String> alumno = new ParGenerico<>(2525043, "Jesus Arnulfo Tenorio Valdez");
         alumno.mostrarPar();
 
         // Par de String y Double (Materia -> Promedio)
-        ParGenerico<String, Double> calificacion = new ParGenerico<>("Paradigmas", 9.8);
+        ParGenerico<String, Double> calificacion = new ParGenerico<>("Paradigmas", 9.0);
         calificacion.mostrarPar();
     }
 }
