@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ferretería — Control de Inventario</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f8; }
+        header { background: #1d3557; color: #fff; padding: 20px 32px; }
+        main { max-width: 1050px; margin: 24px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 16px 0 24px; }
+        .card { border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; }
+        input { width: 92%; padding: 8px; margin: 6px 0; border: 1px solid #cbd5e1; border-radius: 4px; }
+        button { background: #1d3557; color: #fff; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; margin-top: 6px; }
+        button.danger { background: #c1121f; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th { background: #1d3557; color: #fff; text-align: left; padding: 10px; }
+        td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Ferretería — Control de Inventario</h1>
+</header>
+<main>
+    <button onclick="listar()">Listar Artículos</button>
+    <div class="grid">
+        <div class="card">
+            <h3>Buscar por ID</h3>
+            <input id="buscarId" type="number" placeholder="ID del artículo">
+            <button onclick="buscar()">Buscar</button>
+        </div>
+        <div class="card">
+            <h3>Insertar Artículo</h3>
+            <input id="insNombre" placeholder="Nombre del artículo">
+            <input id="insPrecio" type="number" step="0.01" placeholder="Precio">
+            <input id="insExist" type="number" placeholder="Existencia">
+            <button onclick="insertar()">Guardar</button>
+        </div>
+        <div class="card">
+            <h3>Actualizar Artículo</h3>
+            <input id="updId" type="number" placeholder="ID a actualizar">
+            <input id="updNombre" placeholder="Nuevo nombre">
+            <input id="updPrecio" type="number" step="0.01" placeholder="Nuevo precio">
+            <input id="updExist" type="number" placeholder="Nueva existencia">
+            <button onclick="actualizar()">Actualizar</button>
+        </div>
+        <div class="card">
+            <h3>Eliminar Artículo</h3>
+            <input id="delId" type="number" placeholder="ID a eliminar">
+            <button class="danger" onclick="eliminar()">Eliminar</button>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Nombre Artículo</th><th>Precio</th><th>Existencia</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+    </table>
+</main>
+<script>
+const API = "http://localhost:8082/api/articulos";
+async function listar() {
+    const res = await fetch(API);
+    const data = await res.json();
+    render(data);
+}
+async function buscar() {
+    const id = document.getElementById("buscarId").value;
+    const res = await fetch(`${API}/${id}`);
+    const item = await res.json();
+    render([item]);
+}
+async function insertar() {
+    await fetch(API, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            nombreArticulo: document.getElementById("insNombre").value,
+            precio: parseFloat(document.getElementById("insPrecio").value),
+            existencia: parseInt(document.getElementById("insExist").value)
+        })
+    });
+    listar();
+}
+async function actualizar() {
+    const id = document.getElementById("updId").value;
+    await fetch(`${API}/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            nombreArticulo: document.getElementById("updNombre").value,
+            precio: parseFloat(document.getElementById("updPrecio").value),
+            existencia: parseInt(document.getElementById("updExist").value)
+        })
+    });
+    listar();
+}
+async function eliminar() {
+    const id = document.getElementById("delId").value;
+    await fetch(`${API}/${id}`, { method: "DELETE" });
+    listar();
+}
+function render(items) {
+    document.getElementById("tbody").innerHTML = items.map(a =>
+        `<tr><td>${a.id}</td><td>${a.nombreArticulo}</td><td>$${a.precio}</td><td>${a.existencia}</td></tr>`
+    ).join("");
+}
+</script>
+</body>
+</html>
